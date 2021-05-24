@@ -1,9 +1,10 @@
 package com.innso.service;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ public class MessageServiceTest {
 	private static final long MESSAGE_ID = 1L;
 	private static final long FIRST_MESSAGE_ID = 1L;
 	private static final long SECOND_MESSAGE_ID = 2L;
-	private static final long MESSAGE_NOT_EXISTS_ID = 2;
+	private static final long MESSAGE_NOT_EXISTS_ID = 100L;
 	private static final long MESSAGE_EXISTS_ID = 1;
 	// @formatter:off
 	private static final Message MESSAGE_TO_SAVE = MessageBuilder.aMessage()
@@ -46,8 +47,16 @@ public class MessageServiceTest {
 																 .createdOn(MESSAGE_DATE)
 																 .hasCanal(null)
 																 .build();;
-	// @formatter:on
-	private MessageService msgService;
+	 private static final Message MESSAGE_NOT_EXISTS = MessageBuilder.aMessage()
+																	 .hasMessageId(MESSAGE_NOT_EXISTS_ID)
+																	 .hasAuthor(AUTHOR_NAME)
+																	 .hasContent(MESSAGE_CONTENT)
+																	 .createdOn(MESSAGE_DATE)
+																	 .hasCanal(MESSAGE_CANAL)
+																	 .build();
+ // @formatter:on
+	private MessageServiceImpl msgService;
+	private Message message;
 
 	@Before
 	public void initialise() {
@@ -61,7 +70,7 @@ public class MessageServiceTest {
 
 	@Test
 	public void shouldReturnMessageWhenMessageFounded() throws MessageNotFoundException {
-		Message message = msgService.findById(MESSAGE_EXISTS_ID);
+		message = msgService.findById(MESSAGE_EXISTS_ID);
 		assertTrue(!message.equals(null));
 	}
 
@@ -85,27 +94,46 @@ public class MessageServiceTest {
 		assertThat(savedMessage, is(MESSAGE_TO_SAVE));
 	}
 
+	@Test(expected = MessageNotFoundException.class)
+	public void shouldThrowExceptionWhenDeleteMessageNotExists() throws MessageNotFoundException {
+		msgService.exists(MESSAGE_NOT_EXISTS);
+	}
+
 	class TestableMessageService extends MessageServiceImpl {
 
 		@Override
 		public Message findById(long id) throws MessageNotFoundException {
-			// @formatter:off
-			Message message = MessageBuilder.aMessage()
-					                 .hasMessageId(MESSAGE_ID)
-									 .hasAuthor(AUTHOR_NAME)
-									 .hasContent(MESSAGE_CONTENT)
-									 .createdOn(MESSAGE_DATE)
-									 .hasCanal(MESSAGE_CANAL)
-							   		.build();
-			// @formatter:on
-			if (message != null && message.getMessageId() == id)
-				return message;
+
+			List<Message> messages = messages();
+			for (Message message : messages) {
+				if (message.getMessageId() == id) {
+					return message;
+				}
+			}
 			throw new MessageNotFoundException();
 		}
 
 		@Override
 		public List<Message> findAll() {
-			List<Message> messages = Collections.emptyList();
+			return messages();
+		}
+
+		@Override
+		public Message save(Message message) {
+			validate(message);
+			messages().add(message);
+			return message;
+		}
+
+		private void validate(Message message) {
+			if (message == null || message.getCanal() == null) {
+				throw new MessageNonValidException();
+			}
+		}
+
+		@Override
+		public List<Message> messages() {
+			List<Message> messages = new ArrayList<>();
 			// @formatter:off
 			Message firstMessage = MessageBuilder.aMessage()
 					                 .hasMessageId(FIRST_MESSAGE_ID)
@@ -122,28 +150,16 @@ public class MessageServiceTest {
 					.hasCanal(MESSAGE_CANAL)
 					.build();
 			// @formatter:on
-			messages = Arrays.asList(firstMessage, secondMessage);
+			messages.add(firstMessage);
+			messages.add(secondMessage);
 			return messages;
 		}
 
 		@Override
-		public Message save(Message message) {
-			validate(message);
-			return message;
-		}
-
-		private void validate(Message message) {
-			if (message == null || message.getCanal() == null) {
-				throw new MessageNonValidException();
+		public void exists(Message message) throws MessageNotFoundException {
+			if (!messages().contains(message)) {
+				throw new MessageNotFoundException();
 			}
 		}
-
-		@Override
-		public void delete(Message message) {
-			// TODO Auto-generated method stub
-			super.delete(message);
-		}
-
 	}
-
 }

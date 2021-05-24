@@ -103,5 +103,4 @@ public class Message {
 			return false;
 		return true;
 	}
-
 }
