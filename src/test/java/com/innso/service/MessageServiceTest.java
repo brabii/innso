@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.innso.builder.MessageBuilder;
+import com.innso.exception.MessageNonValidException;
 import com.innso.exception.MessageNotFoundException;
 import com.innso.model.Canal;
 import com.innso.model.Message;
@@ -38,6 +39,13 @@ public class MessageServiceTest {
 																 .createdOn(MESSAGE_DATE)
 																 .hasCanal(MESSAGE_CANAL)
 																 .build();
+	private static final Message MESSAGE_NOT_VALID = MessageBuilder.aMessage()
+																 .hasMessageId(MESSAGE_ID)
+																 .hasAuthor(AUTHOR_NAME)
+																 .hasContent(MESSAGE_CONTENT)
+																 .createdOn(MESSAGE_DATE)
+																 .hasCanal(null)
+																 .build();;
 	// @formatter:on
 	private MessageService msgService;
 
@@ -64,6 +72,11 @@ public class MessageServiceTest {
 		} else {
 			assertTrue(!msgService.findAll().isEmpty());
 		}
+	}
+
+	@Test(expected = MessageNonValidException.class)
+	public void shoudThrowExceptionWhenMessageNotValid() throws Exception {
+		msgService.save(MESSAGE_NOT_VALID);
 	}
 
 	@Test
@@ -112,6 +125,25 @@ public class MessageServiceTest {
 			messages = Arrays.asList(firstMessage, secondMessage);
 			return messages;
 		}
+
+		@Override
+		public Message save(Message message) {
+			validate(message);
+			return message;
+		}
+
+		private void validate(Message message) {
+			if (message == null || message.getCanal() == null) {
+				throw new MessageNonValidException();
+			}
+		}
+
+		@Override
+		public void delete(Message message) {
+			// TODO Auto-generated method stub
+			super.delete(message);
+		}
+
 	}
 
 }

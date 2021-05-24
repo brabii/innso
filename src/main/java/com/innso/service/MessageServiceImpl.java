@@ -8,7 +8,6 @@ import com.innso.model.Message;
 
 public class MessageServiceImpl implements MessageService {
 
-
 	@Override
 	public Message findById(long id) throws MessageNotFoundException {
 		throw new MessageNotFoundException();
@@ -21,7 +20,7 @@ public class MessageServiceImpl implements MessageService {
 
 	@Override
 	public Message save(Message message) {
-		return message;
+		return null;
 	}
 
 	@Override
