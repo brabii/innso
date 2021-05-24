@@ -54,6 +54,14 @@ public class MessageServiceTest {
 																	 .createdOn(MESSAGE_DATE)
 																	 .hasCanal(MESSAGE_CANAL)
 																	 .build();
+	private static final Message MESSAGE_EXISTS = MessageBuilder.aMessage()
+							                          			.hasMessageId(FIRST_MESSAGE_ID)
+										            	 		.hasAuthor(AUTHOR_NAME)
+										            	 		.hasContent(MESSAGE_CONTENT)
+											 					.createdOn(MESSAGE_DATE)
+											 					.hasCanal(MESSAGE_CANAL)
+											 					.build();
+			
  // @formatter:on
 	private MessageServiceImpl msgService;
 	private Message message;
@@ -96,16 +104,24 @@ public class MessageServiceTest {
 
 	@Test(expected = MessageNotFoundException.class)
 	public void shouldThrowExceptionWhenDeleteMessageNotExists() throws MessageNotFoundException {
-		msgService.exists(MESSAGE_NOT_EXISTS);
+		msgService.delete(MESSAGE_NOT_EXISTS);
+	}
+
+	@Test
+	public void shouldDeleteMessage() throws MessageNotFoundException {
+		msgService.delete(MESSAGE_EXISTS);
+		assertTrue(!msgService.messages.contains(MESSAGE_EXISTS));
+		System.err.println(msgService.messages);
 	}
 
 	class TestableMessageService extends MessageServiceImpl {
+		List<Message> messages = messages();
 
 		@Override
 		public Message findById(long id) throws MessageNotFoundException {
 
-			List<Message> messages = messages();
-			for (Message message : messages) {
+			List<Message> messagesList = messages;
+			for (Message message : messagesList) {
 				if (message.getMessageId() == id) {
 					return message;
 				}
@@ -115,13 +131,13 @@ public class MessageServiceTest {
 
 		@Override
 		public List<Message> findAll() {
-			return messages();
+			return messages;
 		}
 
 		@Override
 		public Message save(Message message) {
 			validate(message);
-			messages().add(message);
+			messages.add(message);
 			return message;
 		}
 
@@ -157,9 +173,17 @@ public class MessageServiceTest {
 
 		@Override
 		public void exists(Message message) throws MessageNotFoundException {
-			if (!messages().contains(message)) {
+			if (!messages.contains(message)) {
 				throw new MessageNotFoundException();
 			}
 		}
+
+		@Override
+		public void delete(Message message) throws MessageNotFoundException {
+			exists(message);
+			messages.remove(message);
+			System.err.println("delete methode! " + messages);
+		}
+
 	}
 }

@@ -103,4 +103,11 @@ public class Message {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Message [messageId=" + messageId + ", messageDate=" + messageDate + ", messageAuthor=" + messageAuthor
+				+ ", messageContent=" + messageContent + ", canal=" + canal + "]";
+	}
+
 }

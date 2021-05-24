@@ -7,7 +7,7 @@ import com.innso.exception.MessageNotFoundException;
 import com.innso.model.Message;
 
 public class MessageServiceImpl implements MessageService {
-	private List<Message> messages = Collections.emptyList();
+	List<Message> messages = Collections.emptyList();
 
 	@Override
 	public Message findById(long id) throws MessageNotFoundException {
@@ -25,7 +25,7 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public void delete(Message message) {
+	public void delete(Message message) throws MessageNotFoundException {
 	}
 
 	public List<Message> messages() {

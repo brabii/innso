@@ -13,6 +13,6 @@ public interface MessageService {
 
 	public Message save(Message message);
 
-	public void delete(Message message);
+	public void delete(Message message) throws MessageNotFoundException;
 
 }
