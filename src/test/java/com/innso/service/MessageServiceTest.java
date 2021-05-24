@@ -1,8 +1,7 @@
 package com.innso.service;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +30,15 @@ public class MessageServiceTest {
 	private static final long SECOND_MESSAGE_ID = 2L;
 	private static final long MESSAGE_NOT_EXISTS_ID = 2;
 	private static final long MESSAGE_EXISTS_ID = 1;
+	// @formatter:off
+	private static final Message MESSAGE_TO_SAVE = MessageBuilder.aMessage()
+																 .hasMessageId(MESSAGE_ID)
+																 .hasAuthor(AUTHOR_NAME)
+																 .hasContent(MESSAGE_CONTENT)
+																 .createdOn(MESSAGE_DATE)
+																 .hasCanal(MESSAGE_CANAL)
+																 .build();
+	// @formatter:on
 	private MessageService msgService;
 
 	@Before
@@ -53,9 +61,15 @@ public class MessageServiceTest {
 	public void shouldReturnListOfMessages() throws Exception {
 		if (msgService.findAll().isEmpty()) {
 			assertThat(msgService.findAll(), is(Collections.emptyList()));
-		}else {
-			assertThat(msgService.findAll().size(), is(2));
+		} else {
+			assertTrue(!msgService.findAll().isEmpty());
 		}
+	}
+
+	@Test
+	public void shoudSaveMessage() throws Exception {
+		Message savedMessage = msgService.save(MESSAGE_TO_SAVE);
+		assertThat(savedMessage, is(MESSAGE_TO_SAVE));
 	}
 
 	class TestableMessageService extends MessageServiceImpl {

@@ -61,4 +61,47 @@ public class Message {
 		this.canal = canal;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((canal == null) ? 0 : canal.hashCode());
+		result = prime * result + ((messageAuthor == null) ? 0 : messageAuthor.hashCode());
+		result = prime * result + ((messageContent == null) ? 0 : messageContent.hashCode());
+		result = prime * result + ((messageDate == null) ? 0 : messageDate.hashCode());
+		result = prime * result + (int) (messageId ^ (messageId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Message other = (Message) obj;
+		if (canal != other.canal)
+			return false;
+		if (messageAuthor == null) {
+			if (other.messageAuthor != null)
+				return false;
+		} else if (!messageAuthor.equals(other.messageAuthor))
+			return false;
+		if (messageContent == null) {
+			if (other.messageContent != null)
+				return false;
+		} else if (!messageContent.equals(other.messageContent))
+			return false;
+		if (messageDate == null) {
+			if (other.messageDate != null)
+				return false;
+		} else if (!messageDate.equals(other.messageDate))
+			return false;
+		if (messageId != other.messageId)
+			return false;
+		return true;
+	}
+
 }
